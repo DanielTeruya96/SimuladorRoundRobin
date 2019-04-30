@@ -18,7 +18,12 @@ import java.util.Scanner;
 import java.util.Vector;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import simulador.de.rr.model.Global;
 import simulador.de.rr.model.Memoria;
 import simulador.de.rr.model.Processo;
 import threads.CriadorProcesso;
@@ -41,12 +46,18 @@ public class SimuladorDeRR {
        List<Processo> processos = new ArrayList<Processo>();
        BlockingQueue<Processo> filaEntrada = new LinkedBlockingQueue<>();
        BlockingQueue<Processo> filaPronto = new LinkedBlockingQueue<>();
+       BlockingQueue<Integer> idProntos = new LinkedBlockingDeque<>();
+       Lock m = new ReentrantLock () ;
+       Condition P = m.newCondition () ;
        
         int tmp,n,tq;
         tmp = Integer.parseInt(entrada[0]);
         n = Integer.parseInt(entrada[1]);
         tq = Integer.parseInt(entrada[2]);
-        Memoria memoria = new Memoria(tmp);
+        Global.criarMemoria(tmp,m,P);
+        Global.criarDisco();
+        Global.setTq(tq);
+        
         for (int i = 3; i < (n*4)+3; i+=4) {
             int id,tp,tc,tb;
             id = Integer.parseInt(entrada[i]);
@@ -57,11 +68,11 @@ public class SimuladorDeRR {
             processos.add(p);
         }
         Collections.sort(processos);
-        CriadorProcesso cp = new CriadorProcesso(processos,filaEntrada);
+        CriadorProcesso cp = new CriadorProcesso(processos, idProntos);
         Thread threadCriadorProcesso = new Thread(cp);
         threadCriadorProcesso.start();
         
-        EscalonadorLongoPrazo ep = new EscalonadorLongoPrazo(filaEntrada, filaPronto, memoria);
+        EscalonadorLongoPrazo ep = new EscalonadorLongoPrazo(filaEntrada, filaPronto, m, P);
         Thread threadEscalonadorLongoPrazo = new Thread(ep);
         threadEscalonadorLongoPrazo.start();
         

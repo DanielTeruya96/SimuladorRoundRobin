@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import javax.imageio.IIOException;
 
 
@@ -21,9 +24,13 @@ public class Memoria {
     private int[] memoria;
     private List<Secao> processos;
     private List<Secao> livres;
+    Lock m;
+    Condition P;
 
-    public Memoria(int tamanho) {
+    public Memoria(int tamanho, Lock m, Condition P) {
         this.tamanho = tamanho;
+        this.m = m;
+        this.P = P;
         memoria = new int[tamanho];
         for(int i =0;i<tamanho;i++){
             memoria[i] = -1;
@@ -36,9 +43,15 @@ public class Memoria {
     /**
      * 
      * @param p Processo para colocar na memoria
-     * @throws IOException Memoria cheia
+     * 
      */
     public synchronized void alocarProcesso(Processo p) {
+       
+        if(menorTamanho() < p.getTp()){
+            System.out.println("Esperando entrar na memoria");
+           
+        }
+        
         for(Secao s: livres){
             if(s.getTamanho() >= p.getTp()){
                 setarProcesso(s,p);
@@ -89,11 +102,11 @@ public class Memoria {
     
    /**
     * Remover o Processo da memoria
-    * 
+    * Tem que notificar que removeu o processo
     * @param id ID do processo
     * @return Retorna o processo removido da memoria
     */
-    public Processo removerProcesso(int id){
+    public synchronized Processo removerProcesso(int id){
         Secao aux = new Secao();
         for(Secao s: processos){
             if(s.getProcesso().getId() == id){
@@ -102,6 +115,7 @@ public class Memoria {
             }
         }
         desalocarProcesso(aux);
+       
         return aux.getProcesso();
     }
 
@@ -150,6 +164,15 @@ public class Memoria {
             }
         }
         return menor;
+    }
+
+    public Processo getProcesso(Integer i) {
+        for(Secao s: processos){
+            if(s.getProcesso().getId() == i){
+                return s.getProcesso();
+            }
+        }
+        return null;
     }
     
 }

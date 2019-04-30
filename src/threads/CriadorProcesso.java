@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import simulador.de.rr.model.Global;
 import simulador.de.rr.model.Processo;
 
 /**
@@ -18,12 +19,15 @@ import simulador.de.rr.model.Processo;
 public class CriadorProcesso implements Runnable{
     
     private List<Processo> processos;
-    private BlockingQueue<Processo> filaProcesso;
+    
+    private BlockingQueue<Integer> idProntos;
 
-    public CriadorProcesso(List<Processo> processos,  BlockingQueue filaProcesso) {
-         this.processos = processos;
-        this.filaProcesso = filaProcesso;
-      
+   
+
+    public CriadorProcesso(List<Processo> processos, BlockingQueue<Integer> idProntos) {
+        this.processos = processos;
+        
+        this.idProntos = idProntos;
     }
     
     
@@ -45,7 +49,8 @@ public class CriadorProcesso implements Runnable{
                 auxTempo = tempo;
                 System.out.println("Criador de Processo criou  o processo de ID "+p.getId()+" e o colocou na fila de Entrada");
               
-                filaProcesso.add(p);
+                Global.addProcessoDisco(p);
+                idProntos.add(p.getId());
                 
             } catch (InterruptedException ex) {
                 Logger.getLogger(CriadorProcesso.class.getName()).log(Level.SEVERE, null, ex);
