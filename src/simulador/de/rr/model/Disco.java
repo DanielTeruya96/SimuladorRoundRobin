@@ -5,7 +5,9 @@
  */
 package simulador.de.rr.model;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 /**
@@ -15,9 +17,11 @@ import java.util.Queue;
 class Disco {
     
     static Queue<Processo> filaEntrada;
+    public static List<Processo> backingStore;
 
     public Disco() {
         this.filaEntrada = new LinkedList<Processo>();
+        backingStore = new ArrayList<>();
     }
     /**
      * Adiciona o processo p
@@ -48,6 +52,27 @@ class Disco {
             }
         }
         return aux;
+    }
+    
+    public synchronized boolean vazio(){
+        return filaEntrada.isEmpty();
+    }
+
+    @Override
+    public String toString() {
+        String s = "";
+        for(Processo p: filaEntrada){
+            s += p;
+        }
+        return "Disco{" +s+ '}';
+    }
+
+    int getIDProcesso() {
+        return filaEntrada.peek().getId();
+    }
+
+    int getProcessoTamanhoDisco() {
+       return filaEntrada.peek().getTp();
     }
     
 }

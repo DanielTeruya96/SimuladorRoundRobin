@@ -5,6 +5,9 @@
  */
 package threads;
 
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import simulador.de.rr.model.Global;
 import simulador.de.rr.model.Memoria;
 import simulador.de.rr.model.Processo;
@@ -27,16 +30,36 @@ public class Despachante implements Runnable{
     
 
     @Override
-    public void run() {
-        if(Global.memoria.existeProcesso(i)){
-            Processo p = Global.memoria.getProcesso(i);
-            Temporizador tempo = new Temporizador(p);
+    public synchronized void run() {
+        
+        if(!Global.memoria.existeProcesso(i)){
+            Global.imprimir("Despachante percebe que o processo id "+i+" está no disco e solicita que o swapper traga id="+i+" á memoria");
+            
+            Swapper s = new Swapper(i);
+            Thread t = new Thread(s);
+            t.start();
+            Global.avisoSwapper.lock();
+            try {
+                Global.as.await();
+                Global.imprimir("despachante é avisado pelo Swapper que o processo "+i+" está na memória");
+                
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Despachante.class.getName()).log(Level.SEVERE, null, ex);
+            }finally{
+                Global.avisoSwapper.unlock();
+            }
             
             
-        }else{
+        }
+        Global.imprimir("Despachante percebe que o processo "+i+" esta na memória");
+        
+        Processo p = Global.memoria.getProcesso(i);
+        Temporizador tp = new Temporizador(p);
+        Thread t = new Thread(tp);
+        t.start();
             
         }
        
-    }
-    
 }
+    
+

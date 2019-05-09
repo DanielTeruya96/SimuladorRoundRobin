@@ -47,7 +47,8 @@ public class CriadorProcesso implements Runnable{
                 
                 Thread.sleep(auxTempo*1000);
                 auxTempo = tempo;
-                System.out.println("Criador de Processo criou  o processo de ID "+p.getId()+" e o colocou na fila de Entrada");
+                Global.imprimir("Criador de Processo criou  o processo de ID "+p.getId()+" e o colocou na fila de Entrada");
+                
               
                 Global.addProcessoDisco(p);
                 idProntos.add(p.getId());

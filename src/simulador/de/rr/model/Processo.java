@@ -47,6 +47,10 @@ public class Processo implements Comparable<Processo> {
      * 
      * @return  Retorna o tempo de CPU Burst
      */
+    public void setTb(int tb) {
+        this.tb = tb;
+    }
+
     public int getTb() {
         return tb;
     }

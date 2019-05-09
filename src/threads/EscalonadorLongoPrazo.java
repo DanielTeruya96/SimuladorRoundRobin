@@ -24,17 +24,15 @@ public class EscalonadorLongoPrazo implements Runnable{
     BlockingQueue<Processo> pronto;
    
   
-    Lock m;
-    Condition P;
+
 
  
 
-    public EscalonadorLongoPrazo(BlockingQueue<Processo> filaEntrada, BlockingQueue<Processo> filaPronto, Lock m, Condition P) {
-       this.filaEntrada = filaEntrada;
+   
+
+    public EscalonadorLongoPrazo(BlockingQueue<Processo> filaEntrada, BlockingQueue<Processo> filaPronto) {
+        this.filaEntrada = filaEntrada;
         this.pronto = pronto;
-        
-        this.m = m;
-        this.P = P;
     }
 
   
@@ -46,30 +44,36 @@ public class EscalonadorLongoPrazo implements Runnable{
     @Override
     public synchronized void run() {
         while(true){
-            if(!filaEntrada.isEmpty()){
+            if(!Global.discoVazio()){
+                int id = Global.getIDProcessoDisco();
+                int tamanho = Global.getIDProcessoTamahoDisco();
+                Global.imprimir("Escalonador FCFS de longo prazo escolheu o processo ID: "+id);
                 
-                 
+                
+                
+                if(tamanho > Global.memoria.menorTamanho()){
+                    Global.imprimir("Escalonador FCFS de longo prazo não retirou o processo id"+id+" da fila de entrada porque não há espaço na memória");
                     
-                    if(filaEntrada.peek().getTp() > Global.memoria.menorTamanho()){
-                    System.out.println("Escalonador FCFS de longo prazo não retirou o processo id da fila de entrada porque não há espaço na memória");
-                       m.lock();
-                        try {
-                            P.await();
-                        } catch (InterruptedException ex) {
-                            Logger.getLogger(EscalonadorLongoPrazo.class.getName()).log(Level.SEVERE, null, ex);
-                        }finally{
-                             m.unlock();
-                        }
-                      
+                    Global.m.lock();
+                    try {
+                        Global.P.await();
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(EscalonadorLongoPrazo.class.getName()).log(Level.SEVERE, null, ex);
+                    }finally{
+                        Global.m.unlock();
                     }
-                    Processo p = filaEntrada.poll();
-                    System.out.println("Escalonador FCFS de longo prazo escolheu o processo ID: "+p.getId());
-                    pronto.add(p);
-                    System.out.println("Escalonador FCFS de longo prazo retirou o processo ID: "+p.getId()+" da fila de entrada, colocando-o na fila de prontos.");
-                    Global.memoria.alocarProcesso(p);
                     
+                }else{
+                    Processo p = Global.getProcessoDisco();
+                    Global.imprimir("Escalonador FCFS de longo prazo retirou o processo ID: "+p.getId()+" da fila de entrada, colocando-o na fila de prontos.");
                     
                 
+                    Global.memoria.alocarProcesso(p);
+                }
+                
+                
+               
+            } else {
             }
         }
     }

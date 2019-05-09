@@ -21,7 +21,7 @@ public class Secao implements Comparable<Secao>{
         this.fim = fim;
     }
 
-    Secao() {
+    public Secao() {
        
     }
     /**
@@ -75,5 +75,15 @@ public class Secao implements Comparable<Secao>{
     public Processo getProcesso() {
         return this.p;
     }
+
+    @Override
+    public String toString() {
+        if(p == null){
+            return "Secao{" + "p=" + null + ", base=" + base + ", fim=" + fim + '}';
+        }
+        return "Secao{" + "p=" + p.getId() + ", base=" + base + ", fim=" + fim + '}';
+    }
+    
+    
     
 }

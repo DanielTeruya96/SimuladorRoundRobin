@@ -28,6 +28,7 @@ import simulador.de.rr.model.Memoria;
 import simulador.de.rr.model.Processo;
 import threads.CriadorProcesso;
 import threads.EscalonadorLongoPrazo;
+import threads.EscalonadorRR;
 
 /**
  *
@@ -42,19 +43,22 @@ public class SimuladorDeRR {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         String entrada[] = sc.nextLine().split(" ");
+        Global.imprimir("Inicio da Observação");
+        
        
        List<Processo> processos = new ArrayList<Processo>();
        BlockingQueue<Processo> filaEntrada = new LinkedBlockingQueue<>();
        BlockingQueue<Processo> filaPronto = new LinkedBlockingQueue<>();
        BlockingQueue<Integer> idProntos = new LinkedBlockingDeque<>();
-       Lock m = new ReentrantLock () ;
-       Condition P = m.newCondition () ;
+     
+       Global.inicializarMutex();
+       Global.inicializaMSwapper();
        
         int tmp,n,tq;
         tmp = Integer.parseInt(entrada[0]);
         n = Integer.parseInt(entrada[1]);
         tq = Integer.parseInt(entrada[2]);
-        Global.criarMemoria(tmp,m,P);
+        Global.criarMemoria(tmp);
         Global.criarDisco();
         Global.setTq(tq);
         
@@ -72,9 +76,13 @@ public class SimuladorDeRR {
         Thread threadCriadorProcesso = new Thread(cp);
         threadCriadorProcesso.start();
         
-        EscalonadorLongoPrazo ep = new EscalonadorLongoPrazo(filaEntrada, filaPronto, m, P);
+        EscalonadorLongoPrazo ep = new EscalonadorLongoPrazo(filaEntrada, filaPronto);
         Thread threadEscalonadorLongoPrazo = new Thread(ep);
         threadEscalonadorLongoPrazo.start();
+        
+        EscalonadorRR er = new EscalonadorRR(idProntos);
+        Thread threadEscalonadorRR = new Thread(er);
+        threadEscalonadorRR.start();
         
         
         

@@ -21,20 +21,33 @@ class Temporizador implements Runnable{
     }
 
     @Override
-    public void run() {
+    public synchronized void run() {
         long aux = 0;
+       
         if(processo.getTb() > Global.tq){
             aux = Global.tq * 1000;
-            
+            processo.setTb(processo.getTb()-Global.tq);
         }else{
             aux = processo.getTb();
             Global.terminou = true;
+            
+            
         }
         try {
             Thread.sleep(aux);
         } catch (InterruptedException ex) {
             Logger.getLogger(Temporizador.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+            Global.avisoTimer.lock();
+        try {
+            Global.at.signalAll();
+        } finally {
+            Global.avisoTimer.unlock();
+        }
+            Global.imprimir("Timer informa ao Escalonador Round-Robin de CPU que o processo "+processo.getId()+" atualmente em execução precisa ser retirado da CPU");
+            
+        
         //Acordar o escalonador RR
         
         

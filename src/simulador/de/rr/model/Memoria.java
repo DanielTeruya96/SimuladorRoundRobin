@@ -1,9 +1,16 @@
+package simulador.de.rr.model;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+
+    
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
- */
-package simulador.de.rr.model;
+
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,6 +20,8 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import javax.imageio.IIOException;
+import simulador.de.rr.model.Processo;
+import simulador.de.rr.model.Secao;
 
 
 /**
@@ -22,17 +31,15 @@ import javax.imageio.IIOException;
 public class Memoria {
     private int tamanho;
     private int[] memoria;
-    private List<Secao> processos;
-    private List<Secao> livres;
-    Lock m;
-    Condition P;
+    public List<Secao> processos;
+    public List<Secao> livres;
+ 
 
-    public Memoria(int tamanho, Lock m, Condition P) {
-        this.tamanho = tamanho;
-        this.m = m;
-        this.P = P;
-        memoria = new int[tamanho];
-        for(int i =0;i<tamanho;i++){
+    public Memoria(int tamanho) {
+        this.tamanho = tamanho+1;
+        
+        memoria = new int[this.tamanho];
+        for(int i =0;i<this.tamanho;i++){
             memoria[i] = -1;
         }
         processos = new ArrayList<>();
@@ -47,14 +54,12 @@ public class Memoria {
      */
     public synchronized void alocarProcesso(Processo p) {
        
-        if(menorTamanho() < p.getTp()){
-            System.out.println("Esperando entrar na memoria");
-           
-        }
+       
         
         for(Secao s: livres){
             if(s.getTamanho() >= p.getTp()){
                 setarProcesso(s,p);
+                
                 return;
             }
         }
@@ -63,10 +68,8 @@ public class Memoria {
     }
     
     private void setarProcesso(Secao s, Processo p) {
-        if(s.getTamanho() != p.getTp()){
-            s.setFim(s.getBase()+p.getTp());
-            
-        }
+        
+        s.setFim(s.getBase()+p.getTp());
         s.setP(p);
         for(int i = s.getBase(); i<s.getFim();i++){
             memoria[i] = p.getId();
@@ -81,20 +84,27 @@ public class Memoria {
         
         livres = new ArrayList();
         Secao s = new Secao();
+        int count = 0;
         boolean contando = false;
         for (int i = 0; i < tamanho; i++) {
             if(memoria[i] == -1 && !contando){
                 contando = true;
                 s.setBase(i);
             }else if(contando){
+                count++;
+                
+            }
+            if(contando && memoria[i] != -1){
                 s.setFim(i);
-                contando = false;
                 livres.add(s);
                 s = new Secao();
+                contando = false;
             }
             if(contando && i == tamanho-1){
                 s.setFim(i);
                 livres.add(s);
+                s = new Secao();
+                contando = false;
             }
         }
         
@@ -133,20 +143,23 @@ public class Memoria {
      * @return o processo que foi removido
      * @throws IOException 
      */
-    public Processo removerPrimeiroProcesso() throws IOException{
+    public Processo removerPrimeiroProcesso(){
         if(!processos.isEmpty()){
             return removerProcesso(processos.get(0).getProcesso().getId());
         }
-        throw new IOException();
+        return null;
     }
     /**
      * Verifica se existe o processo na memoria
      * @param id ID do processo
      * @return true se existir false se não existir
      */
-    public boolean existeProcesso(int id){
+    public synchronized boolean existeProcesso(int id){
+        
         for(Secao s:processos){
+            
             if(s.getProcesso().getId() == id){
+               
                 return true;
             }
         }
@@ -157,9 +170,10 @@ public class Memoria {
      * @return o numero do menor tamanho possivel para alocação
      */
     public int menorTamanho(){
-        int menor = tamanho;
+        int menor = 0;
         for(Secao s: livres){
-            if(menor< s.getTamanho()){
+            
+            if(menor < s.getTamanho()){
                 menor = s.getTamanho();
             }
         }
