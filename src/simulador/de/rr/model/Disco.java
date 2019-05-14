@@ -44,10 +44,19 @@ class Disco {
      */
     public synchronized  Processo removePorID(int id){
         Processo aux = null;
+        for(Processo p:backingStore){
+            if(p.getId() == id){
+                backingStore.remove(p);
+                return p;
+            }
+        }
+        
+        
         for(Processo p: filaEntrada){
             if(p.getId() == id){
-                aux = p;
+                
                 filaEntrada.remove(p);
+                return p;
                 
             }
         }
@@ -67,12 +76,15 @@ class Disco {
         return "Disco{" +s+ '}';
     }
 
-    int getIDProcesso() {
+    public int getIDProcesso() {
         return filaEntrada.peek().getId();
     }
 
-    int getProcessoTamanhoDisco() {
+    public int getProcessoTamanhoDisco() {
        return filaEntrada.peek().getTp();
+    }
+    public void setProcessoBackingSotre(Processo p){
+        backingStore.add(p);
     }
     
 }

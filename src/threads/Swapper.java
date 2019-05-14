@@ -31,7 +31,8 @@ public class Swapper implements Runnable{
            
           
                Processo aux = Global.memoria.removerPrimeiroProcesso();
-               Global.addProcessoDisco(aux);
+               Global.addBackingSotre(aux);
+               
                Global.imprimir("Swapper retirou o processo "+aux.getId()+" para liberar espaço na memória, e o enviou ao disco");
                
                
@@ -50,11 +51,13 @@ public class Swapper implements Runnable{
        
        Global.avisoSwapper.lock();
         try {
+            Global.imprimir("Swapper avisa ao despachante que o processo "+p.getId()+" esta na memória");
             Global.as.signal();
         } finally {
+            
             Global.avisoSwapper.unlock();
         }
-        Global.imprimir("Swapper avisa ao despachante que o processo "+p.getId()+" esta na memória");
+        
        
     }
     

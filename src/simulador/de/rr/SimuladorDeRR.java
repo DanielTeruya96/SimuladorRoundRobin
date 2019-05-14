@@ -54,6 +54,7 @@ public class SimuladorDeRR {
        Global.inicializarMutex();
        Global.inicializaMSwapper();
        
+       
         int tmp,n,tq;
         tmp = Integer.parseInt(entrada[0]);
         n = Integer.parseInt(entrada[1]);
@@ -61,7 +62,7 @@ public class SimuladorDeRR {
         Global.criarMemoria(tmp);
         Global.criarDisco();
         Global.setTq(tq);
-        
+        Global.inicializaFlag(n); 
         for (int i = 3; i < (n*4)+3; i+=4) {
             int id,tp,tc,tb;
             id = Integer.parseInt(entrada[i]);
@@ -76,13 +77,20 @@ public class SimuladorDeRR {
         Thread threadCriadorProcesso = new Thread(cp);
         threadCriadorProcesso.start();
         
-        EscalonadorLongoPrazo ep = new EscalonadorLongoPrazo(filaEntrada, filaPronto);
-        Thread threadEscalonadorLongoPrazo = new Thread(ep);
-        threadEscalonadorLongoPrazo.start();
+        while(true){
+            boolean terminou = true;
+            for(boolean a: Global.flag){
+                if(!a){
+                    terminou = false;
+                }
+            }
+            if(terminou){
+                break;
+            }
+        }
+        Global.imprimir("Fim da observação");
         
-        EscalonadorRR er = new EscalonadorRR(idProntos);
-        Thread threadEscalonadorRR = new Thread(er);
-        threadEscalonadorRR.start();
+    
         
         
         

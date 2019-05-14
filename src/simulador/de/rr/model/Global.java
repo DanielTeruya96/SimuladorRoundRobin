@@ -6,6 +6,8 @@
 package simulador.de.rr.model;
 
 import com.sun.corba.se.impl.orbutil.concurrent.Mutex;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -28,6 +30,14 @@ public class Global {
     public static Condition as;
     public static Lock m = new ReentrantLock () ;
     public static Condition P = m.newCondition () ;
+    public static boolean flag[];
+    
+    public static void inicializaFlag(int n){
+        flag = new boolean[n];
+        for (int i = 0; i < n; i++) {
+            flag[i] = false;
+        }
+    }
     
     public synchronized static boolean discoVazio(){
         return disco.vazio();
@@ -79,9 +89,15 @@ public class Global {
     }
     
     public synchronized static void imprimir(String s){
-        System.out.println(System.currentTimeMillis()+" : "+s);
+        Date data = new Date();
+        SimpleDateFormat formatador = new SimpleDateFormat("mm:ss");
+        String dataFormatada = formatador.format(data);
+        System.out.println(dataFormatada+" : "+s);
     }
-
+    
+    public static void addBackingSotre(Processo p){
+        disco.setProcessoBackingSotre(p);
+    }
     
     
     

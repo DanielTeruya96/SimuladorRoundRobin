@@ -37,6 +37,10 @@ public class CriadorProcesso implements Runnable{
     @Override
     public void run() {
         int tempo = 0,auxTempo = 0;
+        boolean first = true;
+        
+        
+        
        
         for(Processo p: processos){
             
@@ -52,7 +56,18 @@ public class CriadorProcesso implements Runnable{
               
                 Global.addProcessoDisco(p);
                 idProntos.add(p.getId());
-                
+                if(first){
+                   EscalonadorLongoPrazo ep = new EscalonadorLongoPrazo();
+                   Thread threadEscalonadorLongoPrazo = new Thread(ep);
+                   threadEscalonadorLongoPrazo.start();
+                    
+                   EscalonadorRR er = new EscalonadorRR(idProntos);
+                   Thread threadEscalonadorRR = new Thread(er);
+                   threadEscalonadorRR.start(); 
+                   
+                   
+                   first = false;
+                }
             } catch (InterruptedException ex) {
                 Logger.getLogger(CriadorProcesso.class.getName()).log(Level.SEVERE, null, ex);
             }

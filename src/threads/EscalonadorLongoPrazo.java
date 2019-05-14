@@ -20,8 +20,7 @@ import simulador.de.rr.model.Processo;
  * @author Daniel Leite
  */
 public class EscalonadorLongoPrazo implements Runnable{
-    BlockingQueue<Processo> filaEntrada;
-    BlockingQueue<Processo> pronto;
+   
    
   
 
@@ -30,9 +29,8 @@ public class EscalonadorLongoPrazo implements Runnable{
 
    
 
-    public EscalonadorLongoPrazo(BlockingQueue<Processo> filaEntrada, BlockingQueue<Processo> filaPronto) {
-        this.filaEntrada = filaEntrada;
-        this.pronto = pronto;
+    public EscalonadorLongoPrazo() {
+       
     }
 
   
@@ -43,8 +41,8 @@ public class EscalonadorLongoPrazo implements Runnable{
     
     @Override
     public synchronized void run() {
-        while(true){
-            if(!Global.discoVazio()){
+        while(!Global.discoVazio()){
+            
                 int id = Global.getIDProcessoDisco();
                 int tamanho = Global.getIDProcessoTamahoDisco();
                 Global.imprimir("Escalonador FCFS de longo prazo escolheu o processo ID: "+id);
@@ -73,8 +71,7 @@ public class EscalonadorLongoPrazo implements Runnable{
                 
                 
                
-            } else {
-            }
+            
         }
     }
 

@@ -56,6 +56,7 @@ public class Despachante implements Runnable{
         Processo p = Global.memoria.getProcesso(i);
         Temporizador tp = new Temporizador(p);
         Thread t = new Thread(tp);
+        Global.imprimir("Despachante Reiniciou o Timer com tq="+Global.tq+" e liberou a CPU ao processo ID: "+i);
         t.start();
             
         }

@@ -32,7 +32,7 @@ public class EscalonadorRR implements Runnable{
      */
     @Override
     public synchronized void run() {
-        while(true){
+        while(!idProcesso.isEmpty()){
             if(!idProcesso.isEmpty()){
                 Integer i = idProcesso.poll();
                 Despachante d = new Despachante(i);
@@ -54,6 +54,8 @@ public class EscalonadorRR implements Runnable{
                     if(Global.terminou){
                        Global.memoria.removerProcesso(i);
                        Global.imprimir("Processo "+i+" terminou sua execução");
+                       Global.flag[i] = true;
+                       Global.terminou = false;
                         
                     }else{
                         idProcesso.add(i);
