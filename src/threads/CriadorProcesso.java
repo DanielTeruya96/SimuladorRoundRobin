@@ -20,14 +20,14 @@ public class CriadorProcesso implements Runnable{
     
     private List<Processo> processos;
     
-    private BlockingQueue<Integer> idProntos;
+  
 
    
 
-    public CriadorProcesso(List<Processo> processos, BlockingQueue<Integer> idProntos) {
+    public CriadorProcesso(List<Processo> processos) {
         this.processos = processos;
         
-        this.idProntos = idProntos;
+        
     }
     
     
@@ -51,23 +51,12 @@ public class CriadorProcesso implements Runnable{
                 
                 Thread.sleep(auxTempo*1000);
                 auxTempo = tempo;
-                Global.imprimir("Criador de Processo criou  o processo de ID "+p.getId()+" e o colocou na fila de Entrada");
+                Global.imprimir("Criador de Processo criou  o processo de ID:"+p.getId()+" e o colocou na fila de Entrada");
                 
               
                 Global.addProcessoDisco(p);
-                idProntos.add(p.getId());
-                if(first){
-                   EscalonadorLongoPrazo ep = new EscalonadorLongoPrazo();
-                   Thread threadEscalonadorLongoPrazo = new Thread(ep);
-                   threadEscalonadorLongoPrazo.start();
-                    
-                   EscalonadorRR er = new EscalonadorRR(idProntos);
-                   Thread threadEscalonadorRR = new Thread(er);
-                   threadEscalonadorRR.start(); 
-                   
-                   
-                   first = false;
-                }
+                //idProntos.add(p.getId());
+                
             } catch (InterruptedException ex) {
                 Logger.getLogger(CriadorProcesso.class.getName()).log(Level.SEVERE, null, ex);
             }

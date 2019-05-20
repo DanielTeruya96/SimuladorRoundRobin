@@ -1,19 +1,14 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package threads;
 
-import java.util.List;
+
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import simulador.de.rr.model.Global;
-import simulador.de.rr.model.Memoria;
 import simulador.de.rr.model.Processo;
+
 
 /**
  *
@@ -22,14 +17,16 @@ import simulador.de.rr.model.Processo;
 public class EscalonadorLongoPrazo implements Runnable{
    
    
-  
-
+    
+    private  BlockingQueue<Integer> idProcesso;
 
  
 
    
 
-    public EscalonadorLongoPrazo() {
+
+    public EscalonadorLongoPrazo(BlockingQueue<Integer> idProntos) {
+       this.idProcesso = idProntos;
        
     }
 
@@ -41,8 +38,9 @@ public class EscalonadorLongoPrazo implements Runnable{
     
     @Override
     public synchronized void run() {
-        while(!Global.discoVazio()){
-            
+        
+        while(!Global.finaliza()){
+                if(!Global.discoVazio()){
                 int id = Global.getIDProcessoDisco();
                 int tamanho = Global.getIDProcessoTamahoDisco();
                 Global.imprimir("Escalonador FCFS de longo prazo escolheu o processo ID: "+id);
@@ -61,17 +59,30 @@ public class EscalonadorLongoPrazo implements Runnable{
                         Global.m.unlock();
                     }
                     
-                }else{
-                    Processo p = Global.getProcessoDisco();
-                    Global.imprimir("Escalonador FCFS de longo prazo retirou o processo ID: "+p.getId()+" da fila de entrada, colocando-o na fila de prontos.");
+                }    
+                Swapper sw = new Swapper(id,Global.ESCALONADORFCFS);
+                Thread tr = new Thread(sw);
+                Global.imprimir("Escalonador FCFS solicitou que o Swapper traga id="+id+" a memória");
+                tr.start();
+                synchronized(tr){
+                    try {
+                        tr.wait();
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(EscalonadorLongoPrazo.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    Global.imprimir("Escalonador é avisado pelo Swapper");
+                }
+                
+                idProcesso.add(id);
+                Global.imprimir("Escalonador FCFS colocou id="+id+"na fila de prontos");
+                
                     
                 
-                    Global.memoria.alocarProcesso(p);
-                }
                 
                 
                
             
+            }
         }
     }
 

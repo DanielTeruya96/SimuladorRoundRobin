@@ -9,7 +9,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import simulador.de.rr.model.Global;
-import simulador.de.rr.model.Memoria;
+
 
 /**
  *
@@ -32,8 +32,10 @@ public class EscalonadorRR implements Runnable{
      */
     @Override
     public synchronized void run() {
-        while(!idProcesso.isEmpty()){
+        while(!Global.finaliza()){
+          
             if(!idProcesso.isEmpty()){
+               
                 Integer i = idProcesso.poll();
                 Despachante d = new Despachante(i);
                 Global.imprimir("Escalonador Round-Robin de CPU escolheu o processoid: "+i+", retirou-o da fila de prontos e o encaminhou ao Despachante");
@@ -53,7 +55,7 @@ public class EscalonadorRR implements Runnable{
                     
                     if(Global.terminou){
                        Global.memoria.removerProcesso(i);
-                       Global.imprimir("Processo "+i+" terminou sua execução");
+                       
                        Global.flag[i] = true;
                        Global.terminou = false;
                         

@@ -17,8 +17,12 @@ import simulador.de.rr.model.Processo;
  */
 public class Swapper implements Runnable{
     Integer i;
-    public Swapper(Integer i) {
-        this.i = i;
+    String chamado;
+  
+
+    Swapper(int id, String chamado) {
+        this.i = id;
+        this.chamado = chamado;
     }
 
     @Override
@@ -44,14 +48,20 @@ public class Swapper implements Runnable{
        Global.memoria.alocarProcesso(p);
        Global.m.lock();
         try {
-            Global.P.signal();
+            Global.P.signalAll();
         } finally {
             Global.m.unlock();
         }
        
        Global.avisoSwapper.lock();
         try {
-            Global.imprimir("Swapper avisa ao despachante que o processo "+p.getId()+" esta na memória");
+            if(chamado.equals(Global.DESPACHANTE)){
+                Global.imprimir("Swapper avisa ao despachante que o processo "+p.getId()+" esta na memória");
+            }else{
+                this.notify();
+                Global.imprimir("Swapper avisa o Escalonador de FCFS que o processo"+p.getId()+"esta na memória");
+            }
+            
             Global.as.signal();
         } finally {
             

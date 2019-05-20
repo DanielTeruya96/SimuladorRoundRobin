@@ -35,7 +35,7 @@ public class Despachante implements Runnable{
         if(!Global.memoria.existeProcesso(i)){
             Global.imprimir("Despachante percebe que o processo id "+i+" está no disco e solicita que o swapper traga id="+i+" á memoria");
             
-            Swapper s = new Swapper(i);
+            Swapper s = new Swapper(i,Global.DESPACHANTE);
             Thread t = new Thread(s);
             t.start();
             Global.avisoSwapper.lock();
@@ -58,6 +58,8 @@ public class Despachante implements Runnable{
         Thread t = new Thread(tp);
         Global.imprimir("Despachante Reiniciou o Timer com tq="+Global.tq+" e liberou a CPU ao processo ID: "+i);
         t.start();
+
+        
             
         }
        

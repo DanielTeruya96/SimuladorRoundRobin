@@ -20,6 +20,9 @@ import java.util.logging.Logger;
  */
 public class Global {
     
+    public final static String ESCALONADORFCFS = "EscalonadorFcfs";
+    public final static String DESPACHANTE = "Despachante";
+    
     public static boolean terminou = false;
     public static Memoria memoria;
     public static Disco disco;
@@ -90,7 +93,7 @@ public class Global {
     
     public synchronized static void imprimir(String s){
         Date data = new Date();
-        SimpleDateFormat formatador = new SimpleDateFormat("mm:ss");
+        SimpleDateFormat formatador = new SimpleDateFormat("hh:mm:ss");
         String dataFormatada = formatador.format(data);
         System.out.println(dataFormatada+" : "+s);
     }
@@ -99,6 +102,15 @@ public class Global {
         disco.setProcessoBackingSotre(p);
     }
     
+    public synchronized  static boolean finaliza(){
+         boolean termino = true;
+            for(boolean a: flag){
+                if(!a){
+                    termino = false;
+                }
+            }
+            return termino;
+    }
     
     
     
